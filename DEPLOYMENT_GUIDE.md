@@ -44,7 +44,8 @@ services:
   - type: web
     name: burnout-detection-api
     env: python
-    buildCommand: pip install -r requirements.txt
+    pythonVersion: "3.11.0"
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
@@ -53,9 +54,14 @@ services:
         sync: false
       - key: GEMINI_MODEL_NAME
         value: gemini-pro
-      - key: PYTHON_VERSION
-        value: 3.11.0
+      - key: ALLOWED_ORIGINS
+        sync: false
 ```
+
+**Important Notes:**
+- `pythonVersion: "3.11.0"` explicitly sets Python version (prevents Render from using Python 3.13)
+- Build command upgrades pip first to avoid compatibility issues
+- Uses `psycopg2-binary` in requirements.txt (not `psycopg`)
 
 #### 1.2 Create `Procfile` (Alternative Method)
 
@@ -102,8 +108,15 @@ git push origin main
    - **Branch**: `main` (or your default branch)
    - **Root Directory**: `backend`
    - **Runtime**: `Python 3`
-   - **Build Command**: `pip install -r requirements.txt`
+   - **Python Version**: `3.11.0` (⚠️ **CRITICAL**: Set this explicitly in the dashboard!)
+   - **Build Command**: `pip install --upgrade pip && pip install -r requirements.txt`
    - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   
+   **⚠️ IMPORTANT**: 
+   - **You MUST set Python Version to `3.11.0`** in the Render dashboard settings
+   - Render may default to Python 3.13, which causes build failures with `pydantic-core`
+   - Look for "Python Version" dropdown in the service settings
+   - If you don't see it, go to **Settings** → **Environment** → Add `PYTHON_VERSION=3.11.0`
 
 4. **Configure Environment Variables**
    
@@ -415,9 +428,16 @@ Open browser console (F12) on your Vercel frontend and check:
 
 **Solution:**
 - Check Render build logs for specific errors
+- **Verify Python version is set to 3.11.0** in Render dashboard (not 3.13)
 - Verify `requirements.txt` includes all dependencies
-- Ensure Python version is compatible (3.8+)
+- Ensure `psycopg2-binary` is used (not `psycopg`)
 - Check that `startCommand` is correct
+- Try updating pip first: `pip install --upgrade pip && pip install -r requirements.txt`
+
+**Common Build Errors:**
+- **Rust compilation errors**: Usually means Python version mismatch or outdated package versions
+- **"can't execute an empty query"**: Database initialization issue (already fixed in code)
+- **Package not found**: Check `requirements.txt` has correct package names
 
 **Problem: Backend crashes after deployment**
 
