@@ -149,6 +149,7 @@ DATABASE_URL=sqlite:///./burnout_detection.db
 - [API Documentation](docs/API.md)
 - [Ethical Guidelines](docs/ETHICS.md)
 - **[Complete Supabase Deployment Guide](SUPABASE_DEPLOYMENT.md)** - Step-by-step guide for running with Supabase (Backend + Frontend)
+- **[Production Deployment Guide](DEPLOYMENT_GUIDE.md)** - Deploy Frontend to Vercel & Backend to Render
 
 ## 🧪 Testing
 
