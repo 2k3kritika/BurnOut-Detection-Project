@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: burnout-detection-api
+    env: python
+    rootDir: backend
+    pythonVersion: 3.11.9
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: GOOGLE_GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL_NAME
+        value: gemini-pro
+      - key: ALLOWED_ORIGINS
+        sync: false
